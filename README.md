@@ -1,6 +1,9 @@
 # Tugas Kecil 3 IF2122 Strategi Algoritma
 
 > Implementasi Algoritma UCS dan A* untuk Menentukan Lintasan Terpendek
+<p align="center">
+    <img src=https://i.pcmag.com/imagery/articles/01IB0rgNa4lGMBlmLyi0VP6-6..v1611346416.png>
+</p>
 
 ## Table of contents
 * [General info](#general-info)
