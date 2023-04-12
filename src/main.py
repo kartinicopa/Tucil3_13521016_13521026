@@ -24,6 +24,7 @@ def main():
     elif algorithm == "UCS":
         path = graph.ucs(start_node, goal_node)
 
+    print(f"Panjang lintasan terpendek: {len(path)-1}")
     print("Lintasan terpendek: ")
     for node in path:
         print(node.name)
@@ -31,16 +32,20 @@ def main():
     # Visualisasi dengan folium
     m = folium.Map(location=[start_node.lat, start_node.lon], zoom_start=15)
 
-    folium.Marker(
-        location=[start_node.lat, start_node.lon],
-        icon=folium.Icon(color='green')
-    ).add_to(m)
+    # Tambahkan marker untuk setiap node
+    for node in graph_data.nodes:
+        if node == start_node:
+            color = 'red'  # node awal diberi warna merah
+        elif node == goal_node:
+            color = 'green'  # node akhir diberi warna hijau
+        else:
+            color = 'blue'  # node lain diberi warna biru
+        folium.Marker(
+            location=[node.lat, node.lon],
+            icon=folium.Icon(color=color)
+        ).add_to(m)
 
-    folium.Marker(
-        location=[goal_node.lat, goal_node.lon],
-        icon=folium.Icon(color='red')
-    ).add_to(m)
-
+    # Tambahkan polyline untuk lintasan terpendek
     for i in range(len(path)-1):
         node1 = path[i]
         node2 = path[i+1]
@@ -48,18 +53,8 @@ def main():
             locations=[[node1.lat, node1.lon], [node2.lat, node2.lon]],
             color='blue'
         ).add_to(m)
-        
-        folium.Marker(
-            location=[node1.lat, node1.lon],
-            icon=folium.Icon(color='blue')
-        ).add_to(m)
-
-        folium.Marker(
-            location=[goal_node.lat, goal_node.lon],
-            icon=folium.Icon(color='green')
-        ).add_to(m)
 
     m.save("map.html")
-    
+
 if __name__ == "__main__":
     main()
