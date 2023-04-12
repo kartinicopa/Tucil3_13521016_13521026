@@ -50,7 +50,7 @@ heuristik yang dipakai adalah jarak garis lurus dari suatu titik ke tujuan.
 Project is: _finished_
 
 ## Author
+|NIM|Nama|
+|----------|---------------|
 | 13521016 | Laila Bilbina |
-|----------|---------------|
 | 13521026 | Kartini Copa |
-|----------|---------------|
