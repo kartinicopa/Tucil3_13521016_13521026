@@ -14,6 +14,7 @@ def make_coordinates(lines):
         list_of_names.append(coordinates[0])
     return list_of_coordinates, list_of_names
 
+
 def make_list_of_lat(c):
     global list_lat
     list_lat = []

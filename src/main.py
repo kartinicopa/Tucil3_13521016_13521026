@@ -2,27 +2,46 @@
 # Program utama dan visualisasi map
 
 import folium
-import src.graph as g
+import graph as g
 
 # PROGRAM UTAMA
 # PROGRAM UTAMA
 file_name = input("Masukkan nama file dalam format .txt: ")
 g.initialize(file_name)
-start_node = input("Masukkan start node: ")
-goal_node = input("Masukkan goal node: ")
+
+# print enter
+
+# Daftar node
+print("Daftar node:")
+print('\n'.join(g.list_of_names))
+
+# Input start node
+start_node = ""
+while start_node not in g.list_of_names:
+    start_node = input("Masukkan start node: ")
+    if start_node not in g.list_of_names:
+        print("Node tidak valid, silakan coba lagi.")
+
+# Input goal node
+goal_node = ""
+while goal_node not in g.list_of_names:
+    goal_node = input("Masukkan goal node: ")
+    if goal_node not in g.list_of_names:
+        print("Node tidak valid, silakan coba lagi.")
 
 # Pilihan algoritma pencarian
-alg_choice = input("Pilih algoritma pencarian (1 untuk UCS, 2 untuk A*): ")
-
+alg_choice = ""
+while alg_choice not in ["1", "2"]:
+    alg_choice = input("Pilih algoritma pencarian (1 untuk UCS, 2 untuk A*): ")
+    if alg_choice not in ["1", "2"]:
+        print("Pilihan tidak valid, silakan coba lagi.")
+        
 if alg_choice == "1":
     print("Hasil (UCS): ")
     path_solution = g.ucs(start_node, goal_node)
 elif alg_choice == "2":
     print("Hasil (A*): ")
     path_solution = g.astar(start_node, goal_node)
-else:
-    print("Pilihan tidak valid. Program berhenti.")
-    exit()
 
 
 list_path = g.path_coords(path_solution)
