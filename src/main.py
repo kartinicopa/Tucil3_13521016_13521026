@@ -3,7 +3,9 @@ import folium
 import os
 
 def get_filename():
+    global filename
     while True:
+        print("\n")
         filename = input("Masukkan nama file: ")
         try:
             graph_data = graph.read_file(filename)
@@ -14,6 +16,7 @@ def get_filename():
 def get_algorithm():
     while True:
         algorithm = input("Masukkan algoritma (A* atau UCS): ")
+        print("\n")
         if algorithm in ["A*", "UCS"]:
             return algorithm
         print("Algoritma tidak valid.")
@@ -31,9 +34,16 @@ def main():
 
     nodes = [node.name for node in graph_data.nodes]
 
+    print("   Daftar node:")
+    for node_name in nodes:
+        print(f"    {node_name}")
+    
+    print("\n")
+    print("Masukkan nama node awal dan tujuan.")
+
     while True:
-        start_node_name = get_node_name("Masukkan nama node awal: ", nodes)
-        goal_node_name = get_node_name("Masukkan nama node tujuan: ", nodes)
+        start_node_name = get_node_name("Node awal: ", nodes)
+        goal_node_name = get_node_name("Node tujuan: ", nodes)
 
         start_node = None
         goal_node = None
@@ -45,6 +55,7 @@ def main():
                 goal_node = node
 
         if not start_node or not goal_node:
+            print
             print("Node awal atau tujuan tidak ditemukan.")
         else:
             break
@@ -59,6 +70,9 @@ def main():
     for i in range(len(path)-1):
             print(path[i].name, "->", end=" ")
     print(path[-1].name)
+    
+    print(f"Menyimpan peta ke file {filename}.html...")
+    print("Buka file tersebut untuk melihat visualisasi peta.")
 
     # Visualisasi dengan folium
     m = folium.Map(location=[start_node.lat, start_node.lon], zoom_start=15)
