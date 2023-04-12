@@ -18,7 +18,7 @@
 Proyek ini dibuat untuk memenuhi tugas kecil 3 IF2211 Strategi Algoritma 2020/2021.
 
 ## Deskripsi Tugas
-    Algoritma UCS (Uniform cost search) dan A* (atau A star) dapat digunakan untuk menentukan 
+Algoritma UCS (Uniform cost search) dan A* (atau A star) dapat digunakan untuk menentukan 
 lintasan terpendek dari suatu titik ke titik lain. Pada tugas kecil 3 ini, anda diminta menentukan 
 lintasan terpendek berdasarkan peta Google Map jalan-jalan di kota Bandung. Dari ruas-ruas jalan
 di peta dibentuk graf. Simpul menyatakan persilangan jalan (simpang 3, 4 atau 5) atau ujung jalan. 
@@ -27,7 +27,7 @@ Jarak antar dua simpul dapat dihitung dari koordinat kedua simpul menggunakan ru
 Euclidean (berdasarkan koordinat) atau dapat menggunakan ruler di Google Map, atau cara 
 lainnya yang disediakan oleh Google Map.
 
-    Langkah pertama di dalam program ini adalah membuat graf yang merepresentasikan peta (di area 
+Langkah pertama di dalam program ini adalah membuat graf yang merepresentasikan peta (di area 
 tertentu, misalnya di sekitar Bandung Utara/Dago). Berdasarkan graf yang dibentuk, lalu program 
 menerima input simpul asal dan simpul tujuan, lalu menentukan lintasan terpendek antara 
 keduanya menggunakan algoritma UCS dan A*. Lintasan terpendek dapat ditampilkan pada 
