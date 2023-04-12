@@ -1,0 +1,70 @@
+# File: main.py
+# Program utama dan visualisasi map
+
+import folium
+import src.graph as g
+
+# PROGRAM UTAMA
+# PROGRAM UTAMA
+file_name = input("Masukkan nama file dalam format .txt: ")
+g.initialize(file_name)
+start_node = input("Masukkan start node: ")
+goal_node = input("Masukkan goal node: ")
+
+# Pilihan algoritma pencarian
+alg_choice = input("Pilih algoritma pencarian (1 untuk UCS, 2 untuk A*): ")
+
+if alg_choice == "1":
+    print("Hasil (UCS): ")
+    path_solution = g.ucs(start_node, goal_node)
+elif alg_choice == "2":
+    print("Hasil (A*): ")
+    path_solution = g.astar(start_node, goal_node)
+else:
+    print("Pilihan tidak valid. Program berhenti.")
+    exit()
+
+
+list_path = g.path_coords(path_solution)
+g.print_route(path_solution)
+
+def color(name, solution):
+    # kalau starting point
+    if name == solution[0][0]:
+        color = 'green'
+    else:
+        # kalau di path
+        if name in solution[0]:
+            color = 'red'
+        else:
+            color = 'blue'
+    return color
+    
+map = folium.Map(location=[g.avg_lat(g.list_lat),g.avg_lon(g.list_lon)],zoom_start=15)
+
+# make markers
+for point in range(0, len(g.list_of_coordinates)):
+    folium.Marker(g.list_of_coordinates[point], popup=g.list_of_names[point], icon=folium.Icon(color=color(g.list_of_names[point], path_solution))).add_to(map)
+
+# make path
+fg = folium.FeatureGroup("Path")
+line = folium.vector_layers.PolyLine(list_path, color='red', weight=10).add_to(fg)
+fg.add_to(map)
+
+# add title
+title_html = '''
+             <h3 align="center" style="font-size:20px"><b>Nama file: {}</b>
+             </h3>
+             '''.format(file_name)
+map.get_root().html.add_child(folium.Element(title_html))
+
+# add lintasan terpendek
+solution = g.string_route(path_solution)
+solution_html = '''
+             <h3 align="center" style="font-size:20px"><b>{}</b>
+             </h3>
+             '''.format(solution)
+map.get_root().html.add_child(folium.Element(solution_html))
+            
+map.add_child(folium.LayerControl())
+map.save(outfile='map.html')
