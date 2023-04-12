@@ -36,7 +36,6 @@ heuristik yang dipakai adalah jarak garis lurus dari suatu titik ke tujuan.
 
 ## Technologies
 * python - version 3.9
-* heapq
 * folium
 
 ## Setup
