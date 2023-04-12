@@ -1,4 +1,5 @@
 import heapq
+from math import sin, cos, sqrt, atan2, radians
 
 class Node:
     def __init__(self, name, lat, lon):
@@ -47,6 +48,24 @@ def read_file(filename):
 
     return graph
 
+def distance_lat_lon(lat1, lon1, lat2, lon2):
+    R = 6373.0 # approximate radius of earth in km
+
+    lat1_rad = radians(lat1)
+    lon1_rad = radians(lon1)
+    lat2_rad = radians(lat2)
+    lon2_rad = radians(lon2)
+
+    dlon = lon2_rad - lon1_rad
+    dlat = lat2_rad - lat1_rad
+
+    a = sin(dlat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c * 1000 # convert to meters
+    return distance
+
+
 def A_star(start_node, goal_node):
     frontier = []
     heapq.heappush(frontier, (0, start_node))
@@ -54,6 +73,7 @@ def A_star(start_node, goal_node):
     cost_so_far = {}
     came_from[start_node] = None
     cost_so_far[start_node] = 0
+    total_distance = 0
 
     while len(frontier) > 0:
         current_node = heapq.heappop(frontier)[1]
@@ -65,9 +85,12 @@ def A_star(start_node, goal_node):
             new_cost = cost_so_far[current_node] + weight
             if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
                 cost_so_far[neighbor] = new_cost
-                priority = new_cost + ((neighbor.lat - goal_node.lat)**2 + (neighbor.lon - goal_node.lon)**2)**0.5
+                priority = new_cost + distance_lat_lon(neighbor.lat, neighbor.lon, goal_node.lat, goal_node.lon)
                 heapq.heappush(frontier, (priority, neighbor))
                 came_from[neighbor] = current_node
+
+                # calculate distance traveled so far
+                total_distance += distance_lat_lon(current_node.lat, current_node.lon, neighbor.lat, neighbor.lon)
 
     path = []
     current_node = goal_node
@@ -77,7 +100,8 @@ def A_star(start_node, goal_node):
     path.append(start_node)
     path.reverse()
 
-    return path
+    return path, total_distance
+
 
 def ucs(start_node, goal_node):
     frontier = []
@@ -86,6 +110,7 @@ def ucs(start_node, goal_node):
     cost_so_far = {}
     came_from[start_node] = None
     cost_so_far[start_node] = 0
+    total_distance = 0
 
     while len(frontier) > 0:
         current_node = heapq.heappop(frontier)[1]
@@ -101,6 +126,9 @@ def ucs(start_node, goal_node):
                 heapq.heappush(frontier, (priority, neighbor))
                 came_from[neighbor] = current_node
 
+                # calculate distance traveled so far
+                total_distance += distance_lat_lon(current_node.lat, current_node.lon, neighbor.lat, neighbor.lon)
+
     path = []
     current_node = goal_node
     while current_node != start_node:
@@ -109,4 +137,7 @@ def ucs(start_node, goal_node):
     path.append(start_node)
     path.reverse()
 
-    return path
+    return path, total_distance
+
+
+

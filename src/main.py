@@ -1,33 +1,64 @@
 import graph
 import folium
+import os
+
+def get_filename():
+    while True:
+        filename = input("Masukkan nama file: ")
+        try:
+            graph_data = graph.read_file(filename)
+            return filename, graph_data
+        except FileNotFoundError:
+            print(f"File {filename} tidak ditemukan.")
+
+def get_algorithm():
+    while True:
+        algorithm = input("Masukkan algoritma (A* atau UCS): ")
+        if algorithm in ["A*", "UCS"]:
+            return algorithm
+        print("Algoritma tidak valid.")
+
+def get_node_name(prompt, nodes):
+    while True:
+        node_name = input(prompt)
+        if node_name in nodes:
+            return node_name
+        print("Nama node tidak valid.")
 
 def main():
-    filename = input("Masukkan nama file: ")
-    algorithm = input("Masukkan algoritma (A* atau UCS): ")
+    filename, graph_data = get_filename()
+    algorithm = get_algorithm()
 
-    graph_data = graph.read_file(filename)
+    nodes = [node.name for node in graph_data.nodes]
 
-    start_node_name = input("Masukkan nama node awal: ")
-    goal_node_name = input("Masukkan nama node tujuan: ")
+    while True:
+        start_node_name = get_node_name("Masukkan nama node awal: ", nodes)
+        goal_node_name = get_node_name("Masukkan nama node tujuan: ", nodes)
 
-    start_node = None
-    goal_node = None
+        start_node = None
+        goal_node = None
 
-    for node in graph_data.nodes:
-        if node.name == start_node_name:
-            start_node = node
-        elif node.name == goal_node_name:
-            goal_node = node
+        for node in graph_data.nodes:
+            if node.name == start_node_name:
+                start_node = node
+            elif node.name == goal_node_name:
+                goal_node = node
+
+        if not start_node or not goal_node:
+            print("Node awal atau tujuan tidak ditemukan.")
+        else:
+            break
 
     if algorithm == "A*":
-        path = graph.A_star(start_node, goal_node)
+        path, tot_cost = graph.A_star(start_node, goal_node)
     elif algorithm == "UCS":
-        path = graph.ucs(start_node, goal_node)
+        path, tot_cost = graph.ucs(start_node, goal_node)
 
-    print(f"Panjang lintasan terpendek: {len(path)-1}")
+    print(f"Panjang jarak lintasan terpendek: {tot_cost} meter")
     print("Lintasan terpendek: ")
-    for node in path:
-        print(node.name)
+    for i in range(len(path)-1):
+            print(path[i].name, "->", end=" ")
+    print(path[-1].name)
 
     # Visualisasi dengan folium
     m = folium.Map(location=[start_node.lat, start_node.lon], zoom_start=15)
@@ -54,7 +85,8 @@ def main():
             color='blue'
         ).add_to(m)
 
-    m.save("map.html")
+    map_filename = os.path.splitext(filename)[0] + ".html"
+    m.save(map_filename)
 
 if __name__ == "__main__":
     main()
