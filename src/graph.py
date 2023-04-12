@@ -191,6 +191,7 @@ def print_route(solution):
             print(solution[0][i], end=" -> ")
     print("Panjang lintasan: ", solution[1], "meter. ")
     print("Buka map.html dengan Google Chrome untuk melihat visualisasi peta.")
+    print("Peta dapat di zoom in zoom out untuk menyesuaikan visualisasi")
 
 def string_route(solution):
     solution_list = []
@@ -200,7 +201,7 @@ def string_route(solution):
         else:
             solution_list.append(solution[0][i]+" -> ")
     solution_list = ' '.join([str(elem) for elem in solution_list])
-    return "Lintasan terpendek: " + (solution_list) + ", dengan panjang lintasan: " + str(solution[1]) + " meter. "
+    return "Lintasan terpendek: " + (solution_list) + ", dengan jarak: " + str(solution[1]) + " meter. "
 
 def initialize(file_name):
     data_folder = "../test/"

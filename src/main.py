@@ -38,14 +38,14 @@ while alg_choice not in ["1", "2"]:
         
 if alg_choice == "1":
     print("Hasil (UCS): ")
-    path_solution = g.ucs(start_node, goal_node)
+    solusiPath = g.ucs(start_node, goal_node)
 elif alg_choice == "2":
     print("Hasil (A*): ")
-    path_solution = g.astar(start_node, goal_node)
+    solusiPath = g.astar(start_node, goal_node)
 
 
-list_path = g.path_coords(path_solution)
-g.print_route(path_solution)
+list_path = g.path_coords(solusiPath)
+g.print_route(solusiPath)
 
 def color(name, solution):
     # kalau starting point
@@ -63,7 +63,7 @@ map = folium.Map(location=[g.avg_lat(g.list_lat),g.avg_lon(g.list_lon)],zoom_sta
 
 # make markers
 for point in range(0, len(g.list_of_coordinates)):
-    folium.Marker(g.list_of_coordinates[point], popup=g.list_of_names[point], icon=folium.Icon(color=color(g.list_of_names[point], path_solution))).add_to(map)
+    folium.Marker(g.list_of_coordinates[point], popup=g.list_of_names[point], icon=folium.Icon(color=color(g.list_of_names[point], solusiPath))).add_to(map)
 
 # make path
 fg = folium.FeatureGroup("Path")
@@ -71,19 +71,28 @@ line = folium.vector_layers.PolyLine(list_path, color='red', weight=10).add_to(f
 fg.add_to(map)
 
 # add title
+# add title and metadata
 title_html = '''
-             <h3 align="center" style="font-size:15px"><b>File Name: {}</b>
+             <head>
+             <meta charset="utf-8">
+             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+             <meta name="description" content="Tucil 3 Strategi Algoritma">
+             <meta name="author" content="13521016 dan 13521026">
+             <title>Tucil 3 Strategi Algoritma</title>
+             </head>
+             <h3 align="center" style="font-size:15px"><b>Nama file: {}</b>
              </h3>
              '''.format(file_name)
+
 map.get_root().html.add_child(folium.Element(title_html))
 
 # add lintasan terpendek
-solution = g.string_route(path_solution)
-solution_html = '''
+solution = g.string_route(solusiPath)
+htmlSolusi = '''
              <h3 align="center" style="font-size:16px"><b>{}</b>
              </h3>
              '''.format(solution)
-map.get_root().html.add_child(folium.Element(solution_html))
+map.get_root().html.add_child(folium.Element(htmlSolusi))
             
 map.add_child(folium.LayerControl())
 map.save(outfile='map.html')
