@@ -32,16 +32,16 @@ while goal_node not in g.list_of_names:
 # Pilihan algoritma pencarian
 alg_choice = ""
 while alg_choice not in ["1", "2"]:
-    alg_choice = input("Pilih algoritma pencarian (1 untuk UCS, 2 untuk A*): ")
+    alg_choice = input("Pilih algoritma pencarian (1 untuk A*, 2 untuk UCS): ")
     if alg_choice not in ["1", "2"]:
         print("Pilihan tidak valid, silakan coba lagi.")
         
 if alg_choice == "1":
-    print("Hasil (UCS): ")
-    solusiPath = g.ucs(start_node, goal_node)
-elif alg_choice == "2":
-    print("Hasil (A*): ")
+    print("Hasil A*: ")
     solusiPath = g.astar(start_node, goal_node)
+elif alg_choice == "2":
+    print("Hasil UCS: ")
+    solusiPath = g.ucs(start_node, goal_node)
 
 
 list_path = g.path_coords(solusiPath)
