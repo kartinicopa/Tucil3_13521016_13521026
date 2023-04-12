@@ -1,272 +1,112 @@
-# File: graph.py
-import math
+import heapq
 
-def make_coordinates(lines):
-    global list_of_coordinates
-    global list_of_names
-    n = int(lines[0])
-    list_of_coordinates = []
-    list_of_names = []
-    for i in range(1, n+1):
-        coordinates = lines[i].split(" ")
-        coords_list = [float(coordinates[1]), float(coordinates[2])]
-        list_of_coordinates.append(coords_list)
-        list_of_names.append(coordinates[0])
-    return list_of_coordinates, list_of_names
+class Node:
+    def __init__(self, name, lat, lon):
+        self.name = name
+        self.lat = lat
+        self.lon = lon
+        self.edges = []
 
+    def add_edge(self, node, weight):
+        self.edges.append((node, weight))
 
-def make_list_of_lat(c):
-    global list_lat
-    list_lat = []
-    for i in range(len(c)):
-        list_lat.append(c[i][0])
-    return list_lat
+class Graph:
+    def __init__(self):
+        self.nodes = []
 
-def make_list_of_lon(c):
-    global list_lon
-    list_lon = []
-    for i in range(len(c)):
-        list_lon.append(c[i][1])
-    return list_lon
+    def add_node(self, node):
+        self.nodes.append(node)
 
-def avg_lat(lat):
-    return sum(lat) / len(lat)
+def read_file(filename):
+    graph = Graph()
 
-def avg_lon(lon):
-    return sum(lon) / len(lon)
+    with open(filename) as f:
+        for line in f:
+            if line.strip().isdigit():
+                matrix_size = int(line.strip())
+                adjacency_matrix = [[0 for _ in range(matrix_size)] for _ in range(matrix_size)]
+                for i in range(matrix_size):
+                    line = f.readline().strip().split()
+                    node_name = line[0]
+                    node_lat = float(line[1])
+                    node_lon = float(line[2])
+                    node = Node(node_name, node_lat, node_lon)
+                    graph.add_node(node)
+                for i in range(matrix_size):
+                    line = f.readline().strip().split()
+                    for j in range(matrix_size):
+                        adjacency_matrix[i][j] = int(line[j])
+                for i in range(matrix_size):
+                    for j in range(matrix_size):
+                        if adjacency_matrix[i][j] == 1:
+                            node1 = graph.nodes[i]
+                            node2 = graph.nodes[j]
+                            weight = ((node1.lat - node2.lat)**2 + (node1.lon - node2.lon)**2)**0.5
+                            node1.add_edge(node2, weight)
+                            node2.add_edge(node1, weight)
 
-def make_matrix(lines):
-    n = int(lines[0])
-    adj_matrix = []
-    for i in range(n+1, n*2+1):
-        line = lines[i].split(" ")
-        adj_matrix.append(line)
-    return adj_matrix
+    return graph
 
-def make_adj_list(m):
-    global adj_list
-    global list_of_names
-    adj_list = []
-    for i in range(0, len(m)):
-        neighbor = []
-        for j in range(0, len(m)):
-            if m[i][j] == '1':
-                name = convert_to_name(j)
-                neighbor.append(name)
-        adj_list.append(neighbor)
-    return adj_list               
+def A_star(start_node, goal_node):
+    frontier = []
+    heapq.heappush(frontier, (0, start_node))
+    came_from = {}
+    cost_so_far = {}
+    came_from[start_node] = None
+    cost_so_far[start_node] = 0
 
-def make_adj_matrix(m):
-    global adj_matrix
-    global list_of_coordinates
-    n = len(m)
-    adj_matrix = [[ 0 for i in range(n)] for j in range(n)]
-    for i in range(0,n):
-        for j in range(0,n):
-            if m[i][j] == '1':
-                distance = haversineDistance(list_of_coordinates[i],list_of_coordinates[j])
-                adj_matrix[i][j] = distance
-    return adj_matrix
+    while len(frontier) > 0:
+        current_node = heapq.heappop(frontier)[1]
 
-def make_heuristic_matrix(m):
-    global heuristic_matrix
-    global list_of_coordinates
-    n = len(m)
-    heuristic_matrix = [[ 0 for i in range(n)] for j in range(n)]
-    for i in range(0,n):
-        for j in range(0,n):
-            if (i!=j):
-                distance = haversineDistance(list_of_coordinates[i],list_of_coordinates[j])
-                heuristic_matrix[i][j] = distance
-            else:
-                heuristic_matrix[i][j] = 0
-    return heuristic_matrix
-
-# parameternya list coordinate a [lat,lon], list coordinate b [lat,lon]
-# return: haversineDistance dalam meters 
-def haversineDistance(a,b):
-    # ambil nilai latitude dan longtitude
-    lat1 = a[0]
-    lon1 = a[1]
-    lat2 = b[0]
-    lon2 = b[1]
-     # convert ke radian
-    lat1_rad = lat1 * math.pi / 180.0
-    lat2_rad = lat2 * math.pi / 180.0 
-    # selisih latitude dan longtitude dalam radian
-    delta_lat = (lat2 - lat1) * math.pi / 180.0
-    delta_lon = (lon2 - lon1) * math.pi / 180.0
-    # bagian dari rumus (yang di dalam akar)
-    a = (pow(math.sin(delta_lat / 2), 2) + pow(math.sin(delta_lon / 2), 2) * math.cos(lat1_rad) * math.cos(lat2_rad))
-    # radius bumi
-    r = 6371
-    # rumus untuk mendapatkan distance dalam meter
-    distance = 2 * r * math.asin(math.sqrt(a)) * 1000
-    return distance
-
-# convert node name to node index
-def convert_to_idx(node_name):
-    global list_of_names
-    idx = 0
-    for i in range(len(list_of_names)):
-        if (list_of_names[i] == node_name):
-            idx = i
-    return idx
-
-# convert node index to node name
-def convert_to_name(idx):
-    global list_of_names
-    name = ''
-    for i in range(len(list_of_names)):
-        if (i == idx):
-            name = list_of_names[i]
-    return name
-    
-# initial adalah nama start node (string)
-# final adalah nama goal node (string)
-def astar(initial, final):
-    global adj_matrix
-    global heuristic_matrix
-    global adj_list
-    global list_of_names
-    global path
-
-    # inisialisasi
-    idx_initial = convert_to_idx(initial)
-    idx_final = convert_to_idx(final)
-    queue = [[idx_initial, 0, [initial]]]
-    current_node = []
-
-    # selama queue belum kosong
-    while(len(queue) != 0):
-        # dequeue
-        current_node = queue.pop(0)
-        current_node_idx = convert_to_idx(current_node[0])
-        # jika start node sama dengan goal node
-        if (current_node_idx == idx_final):
+        if current_node == goal_node:
             break
-        # mengunjungi node-node yang bertetangga dengan current_node
-        for neighbor in adj_list[current_node_idx]:
-            # copy visited node
-            visited_node = []
-            for c in current_node[2]:
-                visited_node.append(c)
-            # masukkan neighbor ke visited node
-            i = convert_to_idx(neighbor)
-            visited_node.append(neighbor)
-            # masukkan node ke queue
-            # masukkan informasi: current_node name, f(current_node), visited_node ke queue
-            queue.append([neighbor, adj_matrix[current_node_idx][i] + haversineDistance(list_of_coordinates[i], list_of_coordinates[idx_final]), visited_node])
-            # urutkan menaik, agar selalu pop yang costnya terkecil
-            queue.sort(key = lambda q : q[1])
 
-    # path adalah shortest path
-    path = current_node[2]
-    
-    # hitung cost
-    cost = 0 
-    path_cost = []
-    for node in path:
-        path_cost.append(convert_to_idx(node))
-    for i in range(len(path)-1):
-        cost += adj_matrix[path_cost[i]][path_cost[i+1]]
-    
-    return path, cost
+        for neighbor, weight in current_node.edges:
+            new_cost = cost_so_far[current_node] + weight
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                priority = new_cost + ((neighbor.lat - goal_node.lat)**2 + (neighbor.lon - goal_node.lon)**2)**0.5
+                heapq.heappush(frontier, (priority, neighbor))
+                came_from[neighbor] = current_node
 
-def path_coords(path):
-    global list_of_names
-    global list_of_coordinates
-    global list_of_path_coords
-    list_of_path_coords = []
-    for node in path[0]:
-        list_of_path_coords.append(list_of_coordinates[convert_to_idx(node)])
-    return list_of_path_coords
+    path = []
+    current_node = goal_node
+    while current_node != start_node:
+        path.append(current_node)
+        current_node = came_from[current_node]
+    path.append(start_node)
+    path.reverse()
 
-def print_route(solution):
-    print("Lintasan terpendek: ", end=" ")
-    for i in range(len(solution[0])):
-        if (i == (len(solution[0])-1)):
-            print(solution[0][i])
-        else:
-            print(solution[0][i], end=" -> ")
-    print("Panjang lintasan: ", solution[1], "meter. ")
-    print("Buka map.html dengan Google Chrome untuk melihat visualisasi peta.")
-    print("Peta dapat di zoom in zoom out untuk menyesuaikan visualisasi")
+    return path
 
-def string_route(solution):
-    solution_list = []
-    for i in range(len(solution[0])):
-        if (i == (len(solution[0])-1)):
-            solution_list.append(solution[0][i])
-        else:
-            solution_list.append(solution[0][i]+" -> ")
-    solution_list = ' '.join([str(elem) for elem in solution_list])
-    return "Lintasan terpendek: " + (solution_list) + ", dengan jarak: " + str(solution[1]) + " meter. "
+def ucs(start_node, goal_node):
+    frontier = []
+    heapq.heappush(frontier, (0, start_node))
+    came_from = {}
+    cost_so_far = {}
+    came_from[start_node] = None
+    cost_so_far[start_node] = 0
 
-def initialize(file_name):
-    data_folder = "../test/"
-    file_to_open = data_folder + file_name
-    f = open(file_to_open, "r")
-    lines = f.read().splitlines()
-    coordinates = make_coordinates(lines)[0]
-    list_lat = make_list_of_lat(coordinates)
-    list_lon = make_list_of_lon(coordinates)
-    node_names = make_coordinates(lines)[1]
-    matrix = make_matrix(lines)
-    adj_list = make_adj_list(matrix)
-    adj_matrix = make_adj_matrix(matrix)
-    heur_matrix = make_heuristic_matrix(matrix)
-    
-def ucs(initial, final):
-    global adj_matrix
-    global adj_list
-    global list_of_names
-    global path
-    
-    # inisialisasi
-    idx_initial = convert_to_idx(initial)
-    idx_final = convert_to_idx(final)
-    queue = [[idx_initial, 0, [initial]]]
-    visited = set()
-    current_node = []
-    
-    # selama queue belum kosong
-    while len(queue) != 0:
-        # dequeue
-        current_node = queue.pop(0)
-        current_node_idx = convert_to_idx(current_node[0])
-        current_node_name = current_node[2][-1]
-        # jika start node sama dengan goal node
-        if current_node_idx == idx_final:
+    while len(frontier) > 0:
+        current_node = heapq.heappop(frontier)[1]
+
+        if current_node == goal_node:
             break
-        # kunjungi node-node yang bertetangga dengan current_node
-        for neighbor in adj_list[current_node_idx]:
-            i = convert_to_idx(neighbor)
-            neighbor_name = list_of_names[i]
-            # jika tetangga belum dikunjungi
-            if neighbor_name not in visited:
-                visited.add(neighbor_name)
-                # copy visited node
-                visited_node = []
-                for c in current_node[2]:
-                    visited_node.append(c)
-                # masukkan neighbor ke visited node
-                visited_node.append(neighbor_name)
-                # masukkan node ke queue
-                # masukkan informasi: current_node name, f(current_node), visited_node ke queue
-                queue.append([neighbor, current_node[1] + adj_matrix[current_node_idx][i], visited_node])
-        # urutkan menaik, agar selalu pop yang costnya terkecil
-        queue.sort(key = lambda q : q[1])
-    
-    # path adalah shortest path
-    path = current_node[2]
-    
-    # hitung cost
-    cost = 0
-    path_cost = []
-    for node in path:
-        path_cost.append(convert_to_idx(node))
-    for i in range(len(path)-1):
-        cost += adj_matrix[path_cost[i]][path_cost[i+1]]
-    
-    return path, cost
+
+        for neighbor, weight in current_node.edges:
+            new_cost = cost_so_far[current_node] + weight
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                priority = new_cost
+                heapq.heappush(frontier, (priority, neighbor))
+                came_from[neighbor] = current_node
+
+    path = []
+    current_node = goal_node
+    while current_node != start_node:
+        path.append(current_node)
+        current_node = came_from[current_node]
+    path.append(start_node)
+    path.reverse()
+
+    return path
