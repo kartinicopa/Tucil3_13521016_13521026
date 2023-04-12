@@ -44,11 +44,12 @@ heuristik yang dipakai adalah jarak garis lurus dari suatu titik ke tujuan.
 
 - buka terminal di file test didalam repo yang sudah di clone
 
-- masukkan perintah 'python -u ".\Tucil3_13521016_13521026\src\main.py"
+- masukkan perintah 'python -u ".\Tucil3_13521016_13521026\src\main.py"'
 
 ## Status
 Project is: _finished_
 
 ## Author
 | 13521016 | Laila Bilbina |
+|----------|---------------|
 | 13521026 | Kartini Copa |
