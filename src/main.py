@@ -50,11 +50,11 @@ g.print_route(path_solution)
 def color(name, solution):
     # kalau starting point
     if name == solution[0][0]:
-        color = 'green'
+        color = 'red'
     else:
         # kalau di path
         if name in solution[0]:
-            color = 'red'
+            color = 'green'
         else:
             color = 'blue'
     return color
@@ -72,7 +72,7 @@ fg.add_to(map)
 
 # add title
 title_html = '''
-             <h3 align="center" style="font-size:20px"><b>Nama file: {}</b>
+             <h3 align="center" style="font-size:15px"><b>File Name: {}</b>
              </h3>
              '''.format(file_name)
 map.get_root().html.add_child(folium.Element(title_html))
@@ -80,7 +80,7 @@ map.get_root().html.add_child(folium.Element(title_html))
 # add lintasan terpendek
 solution = g.string_route(path_solution)
 solution_html = '''
-             <h3 align="center" style="font-size:20px"><b>{}</b>
+             <h3 align="center" style="font-size:16px"><b>{}</b>
              </h3>
              '''.format(solution)
 map.get_root().html.add_child(folium.Element(solution_html))
