@@ -15,7 +15,7 @@
 * [Author](#author)
 
 ## General info
-Proyek ini dibuat untuk memenuhi tugas kecil 3 IF2211 Strategi Algoritma 2020/2021.
+Proyek ini dibuat untuk memenuhi tugas kecil 3 IF2211 Strategi Algoritma 2022/2023.
 
 ## Deskripsi Tugas
 Algoritma UCS (Uniform cost search) dan A* (atau A star) dapat digunakan untuk menentukan 
